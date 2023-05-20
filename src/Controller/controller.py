@@ -6,6 +6,7 @@ import networkx as nx
 from osmnx import utils_graph
 from collections import defaultdict
 
+logging.basicConfig(filename='app.log', level=logging.DEBUG)
 
 class Controller:
     
@@ -216,7 +217,7 @@ class Controller:
             self.graph, Y=end[0], X=end[1], return_dist=True
         )
 
-        return not (dist1 > max_separation or dist2 > max_separation)
+        if dist1 > max_separation or dist2 > max_separation: return False
         
 
     def calc_shortest_route_dist(self):
@@ -240,8 +241,8 @@ class Controller:
         shortestPathStats = [
             shortest_route_coordinates,
             self.shortest_dist,
-            self.calculate_elevation(self.shortest_route, "increase"),
-            self.calculate_elevation(self.shortest_route, "decrease"),
+            self.calc_elevation(self.shortest_route, "increase"),
+            self.calc_elevation(self.shortest_route, "decrease"),
         ]
 
         if (self.mode == "maximize" and self.elevation_details[2] == -math.inf) or (self.mode == "minimize" and self.elevation_details[3] == -math.inf):
@@ -282,7 +283,7 @@ class Controller:
 
         pos_inf, neg_inf = math.inf, -math.inf
 
-        self.elevation_details = None
+        self.elevation_details = None 
 
         if mode == "maximize": self.elevation_details = [[], 0.0, neg_inf, neg_inf]
         else: self.elevation_details = [[], 0.0, pos_inf, neg_inf]

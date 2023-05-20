@@ -5,7 +5,7 @@ from flask import Flask, render_template, request
 from src import config
 import json
 from src.Controller.controller import Controller
-from constants import ROUTE_CONSTS
+from src.Controller.constants import ROUTE_CONSTS
 
 from src.Model.model import Model
 
@@ -87,7 +87,3 @@ def generate_map_for_user(start_loc, end_loc, percentage, minmax_option):
         results["elena_drop"] = elevated_path[3]
 
     return results
-
-
-if __name__ == '__main__':
-    app.run()
