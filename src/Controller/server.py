@@ -4,7 +4,9 @@ logging.basicConfig(filename='app.log', level=logging.DEBUG)
 from flask import Flask, render_template, request
 from src import config
 import json
-from src.Controller import controller
+from src.Controller.controller import Controller
+
+from src.Model.model import Model
 
 app = Flask(__name__)
 
@@ -37,8 +39,9 @@ def generate_map_for_user(start_loc, end_loc, percentage, minmax_option):
     """
     The main function which calculates the path given the user constraints.
     """
-
-    controller = controller.Controller()
+    elena_model = Model()
+    graph = elena_model.get_graph(start_loc, end_loc)
+    controller = Controller(graph, percentage, mode=minmax_option)
     path = controller.calc_shortest_path(start_loc, end_loc, percentage, minmax_option)
     return path
 

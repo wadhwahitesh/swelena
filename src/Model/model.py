@@ -16,12 +16,6 @@ class Model:
         self.graph = pkl.load(open("./graph.p", "rb"))
         self.is_graph_loaded = True
         
-    def add_elevation(self, graph):
-        """
-        Elevation data is added to the graph
-        """
-        self.graph = osmnx.add_node_elevations_google(graph, api_key=self.gmaps_key)
-
     def get_graph(self, start_loc, end_loc):
         """
         This method is called by the controller. It returns the graph data with elevations.
@@ -35,6 +29,13 @@ class Model:
         self.dist_from_end_loc(end_loc=end_loc)
 
         return self.graph
+    
+    def add_elevation(self, graph):
+        """
+        Elevation data is added to the graph
+        """
+        self.graph = osmnx.add_node_elevations_google(graph, api_key=self.gmaps_key)
+
 
     def distance_btw_points(self, x1, y1, x2, y2):
         """
