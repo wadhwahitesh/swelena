@@ -1,1 +1,3 @@
 *.java
+src/Controller
+src/Model
