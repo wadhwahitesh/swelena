@@ -31,6 +31,18 @@
             <input type="radio" name="elevation" class="elevation" value="maximize" checked>
             <label for="elevation">Maximize Elevation</label>
         </div>
+        <br>
+        <div id="elevation_type" class="textstyle">
+        <label for="limit" class="textstyle">Percentage (%) of shortest path &nbsp;&nbsp;</label>
+        <input type="number" id="limit" name="limit" min="0" class="textstyle"  style="height: 30px;width: 65px;" value=100>  <br>
+        </div>
+        <br>
+        <button id="reset_button" class="ui_button">Reset</button>
+        <button id="calculate_path" class="ui_button" disabled>Choose start location</button>
+        <br>
+        <br>
+        <div id="metrics" class="textstyle"></div>
+
 </body>
 
 </html>
