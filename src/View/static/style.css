@@ -1,0 +1,132 @@
+/* Cascading Style Sheet for EleNa UI */
+
+/* Added font style for body of the HTML */
+body {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Added margin, font, and text style for h1 header */
+h1 {
+    margin: 0;
+    text-align: center;
+    font-size: 350%;
+}
+
+/* Added color, padding, and font style for the tagline of EleNa */
+#tagline {
+    color: #9933FF;
+    font-size: 100%;
+    font-style: italic;
+    padding-left: 90px;
+}
+
+/* Added text style for the UI */
+.textstyle {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 30px;
+}
+
+/* Added height and width style for the section in which map is displayed in UI */
+#elena_ui {
+    height: 100%;
+    width: 100%;
+}
+
+/* Added style for the section of the UI box which contains the buttons, input box, coordinates and metrics */
+.ui_features {
+    position: fixed;
+    height: 91%;
+    width: 390px;
+    left: 20;
+    top: 20;
+    background-color: #F3904E;
+    color: whitesmoke;
+    box-shadow: whitesmoke 3px 3px, whitesmoke 6px 6px, whitesmoke 9px 9px, whitesmoke 12px 12px;
+    padding-left: 35px;
+    padding-top: 20px;
+    border-radius: 10px;
+}
+
+/* Added border, color and text styles for the metrics displayed in the UI */
+#metrics {
+    background-color: whitesmoke;
+    color: black;
+    box-shadow: #F3904E 3px 3px, #F3904E 6px 6px, #F3904E 9px 9px, #F3904E 12px 12px;
+    border: 1px solid whitesmoke;
+    border-radius: 10px;
+    width: 350px;
+    height: 300px;
+    text-align: center;
+}
+
+/* Added style for the Reset and Calculate Path buttons in the UI */
+.ui_button {
+    cursor: pointer;
+    position: relative;
+    height: 40px;
+    padding-left: 18px;
+    padding-right: 18px;
+    font-size: 16px;
+    text-align: center;
+    text-transform: uppercase;
+    color: whitesmoke;
+    background-color: #9933FF;
+    box-shadow: 0 2px 2px 0 rgba(95, 219, 219, 0.2), 0 3px 3px 0 rgba(95, 219, 219, 0.15), 0 4px 4px 0 rgba(95, 219, 219, 0.10);
+    border: none;
+    border-radius: 5px;
+    margin-right: 10px;
+    overflow: auto;
+}
+
+/* Added opacity style for when the cursor hovers over the button active */
+.ui_button:hover::before {
+    opacity: 0.2;
+}
+
+/* Added style for the buttons before clicked */
+.ui_button::before {
+    content: "";
+    position: absolute;
+    background-color: rgb(255, 255, 255);
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    opacity: 0;
+}
+
+/* Added style for the button to Calculate Path which is disabled */
+.ui_button:disabled {
+    background-color: #9933FF;
+    color: whitesmoke;
+    box-shadow: none;
+    /* Cursor appearance is set to not-allowed for users to understand that the button cannot be clicked 
+    unless the start and end locations are selected */
+    cursor: not-allowed;
+}
+
+/* Added opacity style for button disbaled before it is clicked */
+.ui_button:disabled::before {
+    opacity: 0;
+}
+
+/* Added style for the end marker icon which is used for selecting end location on the map */
+.endmarker {
+    background-image: url('/icon.png');
+    background-size: auto;
+    background-repeat: no-repeat;
+    width: 40px;
+    height: 40px;
+    border-radius: 35%;
+}
+
+/* Added style for the start marker icon which is used for selecting start location on the map */
+.startmarker {
+    background-image: url('/icon.png');
+    background-size: auto;
+    background-repeat: no-repeat;
+    width: 40px;
+    height: 40px;
+    border-radius: 35%;
+}

@@ -1,2 +1,4 @@
 *.java
 *.log
+src/Controller
+src/Model
