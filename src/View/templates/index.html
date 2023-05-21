@@ -42,6 +42,66 @@
         <br>
         <br>
         <div id="metrics" class="textstyle"></div>
+    </div>
+
+    <script>
+        // Initially the metrics are not to be displayed so the div metrics display is set to none
+        document.getElementById('metrics').style.display="none";
+
+        // Loading Mapbox map
+        mapboxgl.accessToken = '{{ ACCESS_KEY }}';
+        var map = new mapboxgl.Map({
+            container: 'elena_ui',
+            style: 'mapbox://styles/mapbox/outdoors-v9',
+            center: [-72.515825, 42.373365],
+            zoom: 12
+        });
+
+        // Add geolocate control to the map.
+        map.addControl(
+            new mapboxgl.GeolocateControl({
+                positionOptions: {
+                    enableHighAccuracy: true
+                },
+        // When active the map will receive updates to the device's location as it changes.
+                trackUserLocation: true,
+        // Draw an arrow next to the location dot to indicate which direction the device is heading.
+                showUserHeading: true
+            })
+        );
+
+        // Adding source containing GeoJSON
+        map.on("load" , () => {
+            // add data source to hold our data we want to display
+            map.addSource('source', {
+            type: 'geojson',
+            data: {
+            "type": "FeatureCollection",
+            "features": [{
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+            "type": "Point"
+            }
+            }]
+            }
+            });
+        }
+        );
+
+        // On cursor movement, get the current latitude and longitude
+        map.on('mousemove', function (e) {
+            // the latitude and longitude are set to 2 decimal points for user-friendly UI
+            var lat = e.lngLat["lat"].toFixed(2)
+            var lon = e.lngLat["lng"].toFixed(2)
+
+            // set the cursor coordinates in the div so the user can see the current location on the map
+            document.getElementById('coordinates').innerHTML = 
+            '<br />' +                   
+                "Positional Coordinates: ("+lat+ ' , ' +lon+')'+'<br />' ;           
+        });
+
+    </script>
 
 </body>
 
