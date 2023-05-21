@@ -11,6 +11,8 @@ logging.basicConfig(filename='app.log', level=logging.DEBUG)
 class Controller:
     
     def __init__(self, graph, percentage=0.0, mode="maximize"):
+        logging.info('Controller message: Initializing controller')
+        # Assigning property values from constructor
         self.graph = graph
         self.percentage = percentage
         self.mode = mode
@@ -246,7 +248,6 @@ class Controller:
         ]
 
         if (self.mode == "maximize" and self.elevation_details[2] == -math.inf) or (self.mode == "minimize" and self.elevation_details[3] == -math.inf):
-            # logging.info('Issue at this place')
             return shortestPathStats, [[], 0.0, 0, 0]
         
         self.elevation_details[0] = [
@@ -254,7 +255,6 @@ class Controller:
             for node in self.elevation_details[0]
         ]
 
-        # logging.info('Issue at second place')
         return shortestPathStats, self.elevation_details
     
     def get_route(self, from_node, to_node):
@@ -273,6 +273,7 @@ class Controller:
         """
         This method calculates the result of user query.
         """
+        logging.info('Controller message: Received user query from server')
         max_separation = 1000
 
         graph = self.graph
