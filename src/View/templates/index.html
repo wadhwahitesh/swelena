@@ -101,6 +101,74 @@
                 "Positional Coordinates: ("+lat+ ' , ' +lon+')'+'<br />' ;           
         });
 
+        var marker_for_start;
+            var marker_for_end;
+
+            // boolean variables to check if the start and end locations have been chosen
+            var bool_start = false;
+            var bool_end = false;
+
+            // emptyn initialization for start and end coordinates
+            var start_location_coordinates = "";
+            var end_location_coordinates = "";
+
+            // creating a featureCollection to store the turf points
+            featureCollection = turf.featureCollection([]);
+
+            // function when the calculate path button is clicked
+            map.on('click', function (e) {
+                // check if the start location is selected
+                if (bool_start == false) {
+                    document.getElementById('calculate_path').innerHTML = "Choose end location"
+                    bool_start = true;
+
+                    // accessing start location coordinates using inbuilt lngLat
+                    start_location_coordinates = JSON.stringify(e.lngLat);
+
+                    // add the lat long to the featureCollection
+                    featureCollection.features.push(turf.point(new Array(e.lngLat.lng, e.lngLat.lat)));
+                    map.getSource('source').setData(featureCollection);
+
+                    // create a marker for the start location on the map
+                    var startmarker = document.createElement('div');
+                    startmarker.className = 'startmarker';
+                    document.getElementById('start_loc_icon').innerHTML = "<img id=\"startmarker\" src= \"/icon.png\" style=\"width:5%\"> Start Location:(" + e.lngLat["lat"].toFixed(2) + "," + e.lngLat["lng"].toFixed(2) + ")";
+
+                    // add the start location marker to the map
+                    marker_for_start = new mapboxgl.Marker(startmarker, { offset: [-40 / 2, -40] })
+                        .setLngLat(e.lngLat)
+                        .addTo(map);
+                    map.flyTo({ center: lngLat });
+
+                    featureCollection.features.push(turf.point(lngLat));
+                    map.getSource('source').setData(featureCollection);
+                }
+                // verifying if end location has been selected
+                else if (bool_end == false) {
+                    bool_end = true
+
+                    // accessing end location coordinates using inbuilt lngLat
+                    end_location_coordinates = JSON.stringify(e.lngLat);
+
+                    // create a marker for the end location on the map
+
+                    document.getElementById('end_loc_icon').innerHTML = "<img id=\"endmarker\" src= \"/icon.png\" style=\"width:5%\"> End Location:(" + e.lngLat["lat"].toFixed(2) + "," + e.lngLat["lng"].toFixed(2) + ")";
+                    var endmarker = document.createElement('div');
+                    endmarker.className = 'endmarker';
+
+                    // add the end location marker to the map
+                    marker_for_end = new mapboxgl.Marker(endmarker, { offset: [-40 / 2, -40] })
+                        .setLngLat(e.lngLat)
+                        .addTo(map);
+                    featureCollection = turf.featureCollection([]);
+                    map.getSource('source').setData(featureCollection);
+
+                    // enable the button to calculate path once both start and end locations have been selected
+                    document.getElementById('calculate_path').disabled = false;
+                    document.getElementById('calculate_path').innerHTML = "Calculate Path"
+                }
+            });
+
     </script>
 
 </body>
