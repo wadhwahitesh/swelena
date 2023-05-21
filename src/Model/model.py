@@ -15,6 +15,7 @@ class Model:
         self.gmaps_key = config.key_dict['gmaps_key']
         if os.path.exists("./graph.p"): self.load_graph()
         else: self.is_graph_loaded = False
+        self.count = 0
     
     def load_graph(self):
         logging.info('Model message: Loading cached graph while model initialization')
@@ -51,7 +52,6 @@ class Model:
         """
         # logging.info('Model message: Calculating distance between points')
         radius = 6371008.8
-
         x1, y1, x2, y2 = np.radians(x1), np.radians(y1), np.radians(x2), np.radians(y2)
         dx, dy = x2 - x1, y2 - y1
 
