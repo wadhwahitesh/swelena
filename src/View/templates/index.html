@@ -169,6 +169,169 @@
                 }
             });
 
+            function reset()
+            {
+                // reset the start and end location coordinates to 0
+                document.getElementById('start_loc_icon').innerHTML ="<img id=\"startmarker\" src= \"/icon.png\" style=\"width:5%\"> Start Location : 0";
+                document.getElementById('end_loc_icon').innerHTML ="<img id=\"endmarker\" src= \"/icon.png\" style=\"width:5%\"> End Location : 0";
+
+                // change the button to show that start location needs to be chosen
+                document.getElementById('calculate_path').innerHTML ="Choose start location"
+
+                // disable the button
+                document.getElementById("calculate_path").disabled = true;
+
+                // remove start and end markers on the map
+                marker_for_start.remove();
+                marker_for_end.remove();
+
+                // reinitialize the coordinates to empty
+                start_location_coordinates = "";
+                end_location_coordinates = "";
+
+                // reinitialize the boolean variables to false to indicate that neither have been chosen yet
+                bool_end = false;
+                bool_start = false;
+
+                // Clearing the percentage field
+                document.getElementById('limit').value = 100
+
+                featureCollection = turf.featureCollection([]);
+                map.getSource('source').setData(featureCollection);
+
+                // reset the layers on the map
+                reset_map_layers()
+
+            }
+
+            function reset_map_layers()
+            {
+                var mapLayers=[]
+                mapLayers.push("shortest_path")
+                mapLayers.push("optimized_path")
+
+                for (var i = 0; i < mapLayers.length; i++) 
+                {
+                    if(map.getLayer(mapLayers[i]))
+                    {
+                        // remove the layer for shortest and optimized path
+                        map.removeLayer(mapLayers[i]);
+
+                    }
+                    if(map.getSource(mapLayers[i]))
+                    {
+                        // remove the source for shortest and optimized path
+                        map.removeSource(mapLayers[i]);
+
+                    }
+                }
+
+                // set the metrics to null
+                document.getElementById('metrics').innerHTML="";
+
+                // set the metrics div display to none
+                document.getElementById('metrics').style.display="none";
+
+
+            }
+
+            document.getElementById('reset_button').onclick=reset;
+
+            function input_map_data(data)
+            {
+                // confirm message if percentage over shortest path given by user is less than 100%
+                if (data["error_flag"]==3)
+                {
+                    var message = alert("Percentage of shortest path given by user is less than or equal to 100%. Please choose over 100%.")
+                    // reset if user clicks cancel for the confirm box
+                    reset()
+                    return
+                }
+
+                else if(data["error_flag"]==1)
+                {
+                    var message = alert("Points selected are out of range. Please select different points")
+                    // reset if user clicks cancel for the confirm box
+                    reset()
+                    return
+                }
+
+                
+                //Adding GeoJSON line to map using addSource and then styling it using addLayer’s paint properties.
+                map.addSource("optimized_path", {
+                    "type": "geojson",
+                    "data": data["elevated_route"]
+                });
+
+                // add the optimized layer to the map
+                map.addLayer({
+                    "id": "optimized_path",
+                    "type": "line",
+                    "source": "optimized_path",
+                    "layout": {
+                        "line-join": "round",
+                        "line-cap": "round"
+                    },
+                    "paint": {
+                        "line-color": "#ec7063",
+                        "line-width": 4
+                    }
+                });
+                
+                //Adding GeoJSON line to map using addSource and then styling it using addLayer’s paint properties.
+                map.addSource("shortest_path", {
+                    "type": "geojson",
+                    "data": data["shortest_route"]
+                });
+
+                // add shortest path to map
+                map.addLayer({
+                    "id": "shortest_path",
+                    "type": "line",
+                    "source": "shortest_path",
+                    "layout": {
+                        "line-join": "round",
+                        "line-cap": "round"
+                    },
+                    "paint": {
+                        "line-color": "#28b463",
+                        "line-width": 4
+                    }
+                });
+
+                // show the metrics div and add the calculated metrics
+                document.getElementById('metrics').style.display="inline-block";
+                document.getElementById('metrics').innerHTML= "<b><u>Elevated path:</u></b>"+ '<br>' +"     Elevation Gain: "+data["elena_gain"].toFixed(2) + 'm<br>'
+                                                                                                    +"     Elevation Drop: "+data["elena_drop"].toFixed(2) + 'm<br>'
+                                                                                                    +"     Elevation Dist: "+data["elena_distance"].toFixed(2) + 'm<br>'
+                                                                                                    +      "<br><b><u>Shortest path:</u></b>"+ '<br>'
+                                                                                                    +"     Shortest Gain: "+data["shortest_gain"].toFixed(2) + 'm<br>'
+                                                                                                    +"     Shortest Drop: "+data["shortest_drop"].toFixed(2) + 'm<br>'
+                                                                                                    +"     Shortest Dist: "+data["shortest_distance"].toFixed(2) + 'm';
+               document.getElementById('metrics').style.display="inline-block";
+
+
+            }
+            document.getElementById('calculate_path').onclick=function(){
+                // check the type of elevation - minimize or maximize
+                var radio_button_output = $('.elevation:checked').val();              
+                var user_map_data='{"start_loc":'+start_location_coordinates+',"percentage":'+document.getElementById('limit').value+',"end_loc":'+end_location_coordinates+',"minmax_choice":"'+radio_button_output.toString()+'"}';
+            
+                reset_map_layers();
+
+                $.ajax({
+                    type: "POST",
+                    url: '/find_route',
+                    data: user_map_data,
+                    success: function(data)
+                    {                       
+                        input_map_data(data);
+                    },
+                    dataType: "json"
+                });
+            };
+
+
     </script>
 
 </body>
