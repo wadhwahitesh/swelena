@@ -1,15 +1,12 @@
-import logging
-logging.basicConfig(filename='app.log', level=logging.DEBUG)
-
-from flask import Flask, render_template, request
-from src import config
 import json
+import logging
+from src import config
+from src.Model.model import Model
+from flask import Flask, render_template, request
 from src.Controller.controller import Controller
 from src.Controller.constants import ROUTE_CONSTS
 
-from src.Model.model import Model
-
-does_graph_exists = False
+logging.basicConfig(filename='app.log', level=logging.DEBUG)
 
 app = Flask(
     __name__,
@@ -25,13 +22,16 @@ def view():
     """
     This is the starting point of the application.
     """
+    logging.info('Server message: Loading the view/home page for the application')
     return render_template("index.html", MAP_VIEW_ACCESS_KEY=config.key_dict['mapview_key'])
 
 @app.route("/calc_route", methods=["POST"])
 def calc_route():
     """
-    This API is called when uer clicks on generate path button on UI.
+    This API is called when user clicks on generate path button on UI.
     """
+
+    logging.info('Server message: Received the user request')
 
     user_input = request.get_json(force=True)
 
@@ -42,6 +42,7 @@ def calc_route():
         minmax_option=user_input["minmax_option"]
     )
 
+    logging.info('Server message: Calculated the route, returning response now to view')
     return json.dumps(output)
 
 def get_json(co_ords):
@@ -56,16 +57,17 @@ def generate_map_for_user(start_loc, end_loc, percentage, minmax_option):
     """
     The main function which calculates the path given the user constraints.
     """
+
     elena_model = Model()
     graph = elena_model.get_graph(start_loc, end_loc)
+
     controller = Controller(graph, percentage, mode=minmax_option)
-    global does_graph_exists
-    does_graph_exists = True
     shortest_path, elevated_path = controller.calc_shortest_path(start_loc, end_loc, percentage, minmax_option)
 
     results = None
 
     if shortest_path is None and elevated_path is None:
+        logging.info('Server message: Shortest path and elevated path were None')
         results = {"shortest_route": [], "elevated_route": []}
         for key in ROUTE_CONSTS: results[key] = 0
 

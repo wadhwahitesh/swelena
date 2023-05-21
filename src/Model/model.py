@@ -1,18 +1,24 @@
 import os
 import osmnx
+import logging
 import numpy as np
 import pickle as pkl
 import networkx as nx
 import src.config as config
 
+logging.basicConfig(filename='app.log', level=logging.DEBUG)
+
 class Model:
 
     def __init__(self):
+        logging.info('Model message: Inside init')
         self.gmaps_key = config.key_dict['gmaps_key']
         if os.path.exists("./graph.p"): self.load_graph()
         else: self.is_graph_loaded = False
+        self.count = 0
     
     def load_graph(self):
+        logging.info('Model message: Loading cached graph while model initialization')
         self.graph = pkl.load(open("./graph.p", "rb"))
         self.is_graph_loaded = True
         
@@ -20,6 +26,8 @@ class Model:
         """
         This method is called by the controller. It returns the graph data with elevations.
         """
+        logging.info('Model message: Received query from controller')
+
         if not self.is_graph_loaded:
             temp_graph = osmnx.graph_from_point(start_loc, dist=20000, network_type="walk")
             self.add_elevation(temp_graph)
@@ -34,6 +42,7 @@ class Model:
         """
         Elevation data is added to the graph
         """
+        logging.info('Model message: Adding elevation to the graph')
         self.graph = osmnx.add_node_elevations_google(graph, api_key=self.gmaps_key)
 
 
@@ -41,8 +50,8 @@ class Model:
         """
         This method calculates the distance between two points.
         """
+        # logging.info('Model message: Calculating distance between points')
         radius = 6371008.8
-
         x1, y1, x2, y2 = np.radians(x1), np.radians(y1), np.radians(x2), np.radians(y2)
         dx, dy = x2 - x1, y2 - y1
 
