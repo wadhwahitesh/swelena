@@ -12,5 +12,25 @@
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.29.0/mapbox-gl.css' rel='stylesheet' />
     <link rel="stylesheet" href="/style.css">
 </head>
+<body>
+    <div id="elena_ui"></div>
+    <div class="ui_features">
+        <h1>EleNa <img id="logo" src="/elena.svg" style="width:15%"></h1>
+        <div id="tagline"> Choose your journey</div>
+        <br>
+        <div id='coordinates'></div>
+        <br>
+        <div id="start_loc_icon" class="textstyle"><img id="startmarker" src="/start-location-icon.svg" style="width:5%">
+            Start Location : 0 </div>
+        <div id="end_loc_icon" class="textstyle"><img id="endmarker" src="/end-location-icon.svg" style="width:5%"> End
+            Location : 0 </div>
+        <br>
+        <div id="elevation_type" class="textstyle">
+            <input type="radio" name="elevation" class="elevation" value="minimize">
+            <label for="elevation">Minimize Elevation</label>
+            <input type="radio" name="elevation" class="elevation" value="maximize" checked>
+            <label for="elevation">Maximize Elevation</label>
+        </div>
+</body>
 
 </html>
