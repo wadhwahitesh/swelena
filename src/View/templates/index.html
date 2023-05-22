@@ -1,0 +1,341 @@
+<html>
+
+<head>
+    <meta charset='utf-8' />
+    <title>520SHAV_EleNa</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.29.0/mapbox-gl.js'></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src='https://api.mapbox.com/mapbox.js/plugins/turf/v3.0.11/turf.min.js'></script>
+
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.29.0/mapbox-gl.css' rel='stylesheet' />
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+    <div id="elena_ui"></div>
+    <div class="ui_features">
+        <h1>SWElena</h1>
+        <div id="tagline"> Finding the best paths! </div>
+        <br>
+        <div id='coordinates'></div>
+        <br>
+        <div id="start_loc_icon" class="textstyle"><img id="startmarker" src="/icon.png" style="width:5%"> Start
+            Location : 0 </div>
+        <div id="end_loc_icon" class="textstyle"><img id="endmarker" src="/icon.png" style="width:5%"> End Location : 0
+        </div>
+        <br>
+        <div id="elevation_type" class="textstyle">
+            <input type="radio" name="elevation" class="elevation" value="minimize">
+            <label for="elevation">Minimize Elevation</label>
+            <input type="radio" name="elevation" class="elevation" value="maximize" checked>
+            <label for="elevation">Maximize Elevation</label>
+        </div>
+        <br>
+        <div id="elevation_type" class="textstyle">
+        <label for="limit" class="textstyle">Percentage (%) of shortest path &nbsp;&nbsp;</label>
+        <input type="number" id="limit" name="limit" min="0" class="textstyle"  style="height: 30px;width: 65px;" value=100>  <br>
+        </div>
+        <br>
+        <button id="reset_button" class="ui_button">Reset</button>
+        <button id="calculate_path" class="ui_button" disabled>Choose start location</button>
+        <br>
+        <br>
+        <div id="metrics" class="textstyle"></div>
+    </div>
+
+    <script>
+        // Initially the metrics are not to be displayed so the div metrics display is set to none
+        document.getElementById('metrics').style.display="none";
+
+        // Loading Mapbox map
+        mapboxgl.accessToken = '{{ MAP_VIEW_ACCESS_KEY }}';
+        var map = new mapboxgl.Map({
+            container: 'elena_ui',
+            style: 'mapbox://styles/mapbox/outdoors-v9',
+            center: [-72.515825, 42.373365],
+            zoom: 12
+        });
+
+        // Add geolocate control to the map.
+        map.addControl(
+            new mapboxgl.GeolocateControl({
+                positionOptions: {
+                    enableHighAccuracy: true
+                },
+        // When active the map will receive updates to the device's location as it changes.
+                trackUserLocation: true,
+        // Draw an arrow next to the location dot to indicate which direction the device is heading.
+                showUserHeading: true
+            })
+        );
+
+        // Adding source containing GeoJSON
+        map.on("load" , () => {
+            // add data source to hold our data we want to display
+            map.addSource('source', {
+            type: 'geojson',
+            data: {
+            "type": "FeatureCollection",
+            "features": [{
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+            "type": "Point"
+            }
+            }]
+            }
+            });
+        }
+        );
+
+        // On cursor movement, get the current latitude and longitude
+        map.on('mousemove', function (e) {
+            // the latitude and longitude are set to 2 decimal points for user-friendly UI
+            var lat = e.lngLat["lat"].toFixed(2)
+            var lon = e.lngLat["lng"].toFixed(2)
+
+            // set the cursor coordinates in the div so the user can see the current location on the map
+            document.getElementById('coordinates').innerHTML = 
+            '<br />' +                   
+                "Positional Coordinates: ("+lat+ ' , ' +lon+')'+'<br />' ;           
+        });
+
+        var marker_for_start;
+            var marker_for_end;
+
+            // boolean variables to check if the start and end locations have been chosen
+            var bool_start = false;
+            var bool_end = false;
+
+            // emptyn initialization for start and end coordinates
+            var start_location_coordinates = "";
+            var end_location_coordinates = "";
+
+            // creating a featureCollection to store the turf points
+            featureCollection = turf.featureCollection([]);
+
+            // function when the calculate path button is clicked
+            map.on('click', function (e) {
+                // check if the start location is selected
+                if (bool_start == false) {
+                    document.getElementById('calculate_path').innerHTML = "Choose end location"
+                    bool_start = true;
+
+                    // accessing start location coordinates using inbuilt lngLat
+                    start_location_coordinates = JSON.stringify(e.lngLat);
+
+                    // add the lat long to the featureCollection
+                    featureCollection.features.push(turf.point(new Array(e.lngLat.lng, e.lngLat.lat)));
+                    map.getSource('source').setData(featureCollection);
+
+                    // create a marker for the start location on the map
+                    var startmarker = document.createElement('div');
+                    startmarker.className = 'startmarker';
+                    document.getElementById('start_loc_icon').innerHTML = "<img id=\"startmarker\" src= \"/icon.png\" style=\"width:5%\"> Start Location:(" + e.lngLat["lat"].toFixed(2) + "," + e.lngLat["lng"].toFixed(2) + ")";
+
+                    // add the start location marker to the map
+                    marker_for_start = new mapboxgl.Marker(startmarker, { offset: [-40 / 2, -40] })
+                        .setLngLat(e.lngLat)
+                        .addTo(map);
+                    map.flyTo({ center: lngLat });
+
+                    featureCollection.features.push(turf.point(lngLat));
+                    map.getSource('source').setData(featureCollection);
+                }
+                // verifying if end location has been selected
+                else if (bool_end == false) {
+                    bool_end = true
+
+                    // accessing end location coordinates using inbuilt lngLat
+                    end_location_coordinates = JSON.stringify(e.lngLat);
+
+                    // create a marker for the end location on the map
+
+                    document.getElementById('end_loc_icon').innerHTML = "<img id=\"endmarker\" src= \"/icon.png\" style=\"width:5%\"> End Location:(" + e.lngLat["lat"].toFixed(2) + "," + e.lngLat["lng"].toFixed(2) + ")";
+                    var endmarker = document.createElement('div');
+                    endmarker.className = 'endmarker';
+
+                    // add the end location marker to the map
+                    marker_for_end = new mapboxgl.Marker(endmarker, { offset: [-40 / 2, -40] })
+                        .setLngLat(e.lngLat)
+                        .addTo(map);
+                    featureCollection = turf.featureCollection([]);
+                    map.getSource('source').setData(featureCollection);
+
+                    // enable the button to calculate path once both start and end locations have been selected
+                    document.getElementById('calculate_path').disabled = false;
+                    document.getElementById('calculate_path').innerHTML = "Calculate Path"
+                }
+            });
+
+            function reset()
+            {
+                // reset the start and end location coordinates to 0
+                document.getElementById('start_loc_icon').innerHTML ="<img id=\"startmarker\" src= \"/icon.png\" style=\"width:5%\"> Start Location : 0";
+                document.getElementById('end_loc_icon').innerHTML ="<img id=\"endmarker\" src= \"/icon.png\" style=\"width:5%\"> End Location : 0";
+
+                // change the button to show that start location needs to be chosen
+                document.getElementById('calculate_path').innerHTML ="Choose start location"
+
+                // disable the button
+                document.getElementById("calculate_path").disabled = true;
+
+                // remove start and end markers on the map
+                marker_for_start.remove();
+                marker_for_end.remove();
+
+                // reinitialize the coordinates to empty
+                start_location_coordinates = "";
+                end_location_coordinates = "";
+
+                // reinitialize the boolean variables to false to indicate that neither have been chosen yet
+                bool_end = false;
+                bool_start = false;
+
+                // Clearing the percentage field
+                document.getElementById('limit').value = 100
+
+                featureCollection = turf.featureCollection([]);
+                map.getSource('source').setData(featureCollection);
+
+                // reset the layers on the map
+                reset_map_layers()
+
+            }
+
+            function reset_map_layers()
+            {
+                var mapLayers=[]
+                mapLayers.push("shortest_path")
+                mapLayers.push("optimized_path")
+
+                for (var i = 0; i < mapLayers.length; i++) 
+                {
+                    if(map.getLayer(mapLayers[i]))
+                    {
+                        // remove the layer for shortest and optimized path
+                        map.removeLayer(mapLayers[i]);
+
+                    }
+                    if(map.getSource(mapLayers[i]))
+                    {
+                        // remove the source for shortest and optimized path
+                        map.removeSource(mapLayers[i]);
+
+                    }
+                }
+
+                // set the metrics to null
+                document.getElementById('metrics').innerHTML="";
+
+                // set the metrics div display to none
+                document.getElementById('metrics').style.display="none";
+
+
+            }
+
+            document.getElementById('reset_button').onclick=reset;
+
+            function input_map_data(data)
+            {
+                // confirm message if percentage over shortest path given by user is less than 100%
+                if (data["error_flag"]==3)
+                {
+                    var message = alert("Percentage of shortest path given by user is less than or equal to 100%. Please choose over 100%.")
+                    // reset if user clicks cancel for the confirm box
+                    reset()
+                    return
+                }
+
+                else if(data["error_flag"]==1)
+                {
+                    var message = alert("Points selected are out of range. Please select different points")
+                    // reset if user clicks cancel for the confirm box
+                    reset()
+                    return
+                }
+
+                
+                //Adding GeoJSON line to map using addSource and then styling it using addLayer’s paint properties.
+                map.addSource("optimized_path", {
+                    "type": "geojson",
+                    "data": data["elevated_route"]
+                });
+
+                // add the optimized layer to the map
+                map.addLayer({
+                    "id": "optimized_path",
+                    "type": "line",
+                    "source": "optimized_path",
+                    "layout": {
+                        "line-join": "round",
+                        "line-cap": "round"
+                    },
+                    "paint": {
+                        "line-color": "#ec7063",
+                        "line-width": 4
+                    }
+                });
+                
+                //Adding GeoJSON line to map using addSource and then styling it using addLayer’s paint properties.
+                map.addSource("shortest_path", {
+                    "type": "geojson",
+                    "data": data["shortest_route"]
+                });
+
+                // add shortest path to map
+                map.addLayer({
+                    "id": "shortest_path",
+                    "type": "line",
+                    "source": "shortest_path",
+                    "layout": {
+                        "line-join": "round",
+                        "line-cap": "round"
+                    },
+                    "paint": {
+                        "line-color": "#28b463",
+                        "line-width": 4
+                    }
+                });
+
+                // show the metrics div and add the calculated metrics
+                document.getElementById('metrics').style.display="inline-block";
+                document.getElementById('metrics').innerHTML= "<b><u>Elevated path:</u></b>"+ '<br>' +"     Elevation Gain: "+data["elena_gain"].toFixed(2) + 'm<br>'
+                                                                                                    +"     Elevation Drop: "+data["elena_drop"].toFixed(2) + 'm<br>'
+                                                                                                    +"     Elevation Dist: "+data["elena_distance"].toFixed(2) + 'm<br>'
+                                                                                                    +      "<br><b><u>Shortest path:</u></b>"+ '<br>'
+                                                                                                    +"     Shortest Gain: "+data["shortest_gain"].toFixed(2) + 'm<br>'
+                                                                                                    +"     Shortest Drop: "+data["shortest_drop"].toFixed(2) + 'm<br>'
+                                                                                                    +"     Shortest Dist: "+data["shortest_distance"].toFixed(2) + 'm';
+               document.getElementById('metrics').style.display="inline-block";
+
+
+            }
+            document.getElementById('calculate_path').onclick=function(){
+                // check the type of elevation - minimize or maximize
+                var radio_button_output = $('.elevation:checked').val();              
+                var user_map_data='{"start_loc":'+start_location_coordinates+',"percentage":'+document.getElementById('limit').value+',"end_loc":'+end_location_coordinates+',"minmax_option":"'+radio_button_output.toString()+'"}';
+            
+                reset_map_layers();
+
+                $.ajax({
+                    type: "POST",
+                    url: '/calc_route',
+                    data: user_map_data,
+                    success: function(data)
+                    {                       
+                        input_map_data(data);
+                    },
+                    dataType: "json"
+                });
+            };
+
+
+    </script>
+
+</body>
+
+</html>
