@@ -49,7 +49,7 @@ h1 {
 }
 
 /* Added border, color and text styles for the metrics displayed in the UI */
-#metrics {
+#results {
     background-color: whitesmoke;
     color: black;
     box-shadow: #F3904E 3px 3px, #F3904E 6px 6px, #F3904E 9px 9px, #F3904E 12px 12px;
