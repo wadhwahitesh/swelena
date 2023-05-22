@@ -8,9 +8,11 @@ Elevation based navigation system is a web application for displaying the optima
 
 - The user should now select the start and end points on the map presented on the screen.
 - The user should select if they want to maximize or minimize the elevation using the buttons available.
-- The user now inputs the percentage increase (with respect to the shortest path) in the total distance that they are willing to travel for their workout.
+- The user now inputs the percentage of the total distance that they are willing to travel for their workout.
 - The user can click on `FIND PATH` button to see the optimal path (in RED) on the map considering elevation. The application also shows the shortest path (in GREEN) without considering the elevation.
 - The user can click on the `RESET` button to reset the app to the initial default view.
+- If distance between start and end is too large, you will get an exception.
+- If percentage `<= 100` you will be thrown an exception.
 
 - To run the tests run `python src/test/test.py` from the home directory.
 
