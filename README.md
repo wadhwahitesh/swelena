@@ -14,7 +14,8 @@ Elevation based navigation system is a web application for displaying the optima
 - If distance between start and end is too large, you will get an exception.
 - If percentage `<= 100` you will be thrown an exception.
 
-- To run the tests run `python src/test/test.py` from the home directory.
+- To run the tests on controller run `python src/test/test_controller.py` from the home directory.
+- To run the tests on model run `python src/test/test_model.py` from the home directory.
 
 
 # Design Pattern 
