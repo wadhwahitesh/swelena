@@ -51,7 +51,7 @@
         document.getElementById('metrics').style.display="none";
 
         // Loading Mapbox map
-        mapboxgl.accessToken = '{{ ACCESS_KEY }}';
+        mapboxgl.accessToken = '{{ MAP_VIEW_ACCESS_KEY }}';
         var map = new mapboxgl.Map({
             container: 'elena_ui',
             style: 'mapbox://styles/mapbox/outdoors-v9',
@@ -317,13 +317,13 @@
             document.getElementById('calculate_path').onclick=function(){
                 // check the type of elevation - minimize or maximize
                 var radio_button_output = $('.elevation:checked').val();              
-                var user_map_data='{"start_loc":'+start_location_coordinates+',"percentage":'+document.getElementById('limit').value+',"end_loc":'+end_location_coordinates+',"minmax_choice":"'+radio_button_output.toString()+'"}';
+                var user_map_data='{"start_loc":'+start_location_coordinates+',"percentage":'+document.getElementById('limit').value+',"end_loc":'+end_location_coordinates+',"minmax_option":"'+radio_button_output.toString()+'"}';
             
                 reset_map_layers();
 
                 $.ajax({
                     type: "POST",
-                    url: '/find_route',
+                    url: '/calc_route',
                     data: user_map_data,
                     success: function(data)
                     {                       
